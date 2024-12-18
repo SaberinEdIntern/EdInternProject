@@ -13,7 +13,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()  
     .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day) 
     .CreateLogger();
-
+builder.Logging.AddSerilog(); 
 builder.Services.AddControllersWithViews();
 
 

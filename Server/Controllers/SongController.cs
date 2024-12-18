@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using music_manager_starter.Data;
 using music_manager_starter.Data.Models;
-using Serilog;  
-using Microsoft.Extensions.Logging;  
+using Serilog; 
+
 namespace music_manager_starter.Server.Controllers
 {
     [Route("api/[controller]")]
@@ -11,22 +11,22 @@ namespace music_manager_starter.Server.Controllers
     public class SongsController : ControllerBase
     {
         private readonly DataDbContext _context;
-        private readonly ILogger<SongsController> _logger; 
 
-        public SongsController(DataDbContext context, ILogger<SongsController> logger)
+        public SongsController(DataDbContext context)
         {
             _context = context;
-            _logger = logger;  // Store logger
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Song>>> GetSongs()
         {
-            _logger.LogInformation("Fetching all songs from the database.");
+            // Directly using Serilog to log
+            Log.Information("Fetching all songs from the database.");
             var songs = await _context.Songs
                 .Include(s => s.Ratings)
                 .ToListAsync();
-            _logger.LogInformation("Successfully fetched {SongCount} songs from the database.", songs.Count);
+
+            Log.Information("Successfully fetched {SongCount} songs from the database.", songs.Count);
             return Ok(songs);
         }
 
@@ -35,14 +35,15 @@ namespace music_manager_starter.Server.Controllers
         {
             if (song == null)
             {
-                _logger.LogWarning("Received null song in PostSong request.");
+                // Serilog 
+                Log.Warning("Received null song in PostSong request.");
                 return BadRequest("Song cannot be null.");
             }
 
-            _logger.LogInformation("Adding new song: {SongTitle} by {SongArtist}.", song.Title, song.Artist);
+            Log.Information("Adding new song: {SongTitle} by {SongArtist}.", song.Title, song.Artist);
             _context.Songs.Add(song);
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Successfully added song with ID: {SongId}.", song.Id);
+            Log.Information("Successfully added song with ID: {SongId}.", song.Id);
 
             return Ok();
         }
@@ -50,13 +51,13 @@ namespace music_manager_starter.Server.Controllers
         [HttpPost("{songId}/ratings")]
         public async Task<ActionResult> PostRating(Guid songId, [FromBody] byte ratingValue)
         {
-            _logger.LogInformation("Received rating {Rating} for song with ID: {SongId}.", ratingValue, songId);
+            Log.Information("Received rating {Rating} for song with ID: {SongId}.", ratingValue, songId);
             var song = await _context.Songs
                 .FirstOrDefaultAsync(s => s.Id == songId);
 
             if (song == null)
             {
-                _logger.LogWarning("Song with ID {SongId} not found.", songId);
+                Log.Warning("Song with ID {SongId} not found.", songId);
                 return NotFound("Song not found.");
             }
 
@@ -69,7 +70,7 @@ namespace music_manager_starter.Server.Controllers
 
             _context.RatingEvents.Add(ratingEvent);
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Successfully added rating for song with ID: {SongId}.", songId);
+            Log.Information("Successfully added rating for song with ID: {SongId}.", songId);
 
             return Ok();
         }

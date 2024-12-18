@@ -11,6 +11,8 @@ namespace music_manager_starter.Data
     public class DataDbContext(DbContextOptions<DataDbContext> options) : DbContext(options)
     {
         public required DbSet<Song> Songs { get; set; }
+
+        // Add a RatingEvent dbset (effectively map the RatingEvent class to a database table)
         public required DbSet<RatingEvent> RatingEvents { get; set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,6 +27,7 @@ namespace music_manager_starter.Data
                 new Song { Id = Guid.Parse("22aa6f84-06d8-4a0e-bdad-3000b35b5b5f"), Title = "Something Real", Artist = "Post Malone", Album = "Twelve Carat Toothache", Genre = "Hip Hop" }
             );
 
+            // here, we set up the primary key for the RatingEvent table - this will ensure each RatingEvent will have its own unique ID
             modelBuilder.Entity<RatingEvent>().HasKey(r => r.Id);
 
 
