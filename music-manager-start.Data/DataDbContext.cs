@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace music_manager_starter.Data
 {
-    public class DataDbContext : DbContext
+    public class DataDbContext(DbContextOptions<DataDbContext> options) : DbContext(options)
     {
-        public DataDbContext(DbContextOptions<DataDbContext> options) : base(options) { }
-
-        public DbSet<Song> Songs { get; set; }
+        public required DbSet<Song> Songs { get; set; }
+        public required DbSet<RatingEvent> RatingEvents { get; set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +24,10 @@ namespace music_manager_starter.Data
                 new Song { Id = Guid.Parse("b7cc1c82-77e2-40d0-8bc2-d7e05962c0e3"), Title = "Utah", Artist = "French Cassettes", Album = "The Great Escape", Genre = "Indie" },
                 new Song { Id = Guid.Parse("22aa6f84-06d8-4a0e-bdad-3000b35b5b5f"), Title = "Something Real", Artist = "Post Malone", Album = "Twelve Carat Toothache", Genre = "Hip Hop" }
             );
+
+            modelBuilder.Entity<RatingEvent>().HasKey(r => r.Id);
+
+
         }
 
     }

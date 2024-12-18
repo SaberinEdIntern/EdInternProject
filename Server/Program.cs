@@ -2,8 +2,23 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using music_manager_starter.Data;
 using System.Security.AccessControl;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+
+// SERILOG CONFIGURATION HERE
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()  
+    .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day) 
+    .CreateLogger();
+
+builder.Services.AddControllersWithViews();
+
+
+
+
 
 // Add services to the container.
 

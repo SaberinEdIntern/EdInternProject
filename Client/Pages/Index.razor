@@ -5,9 +5,28 @@
 
 @code {
     private List<Song> songs;
+    private Dictionary<Guid, byte> songRatings = new Dictionary<Guid, byte>();  
 
     protected override async Task OnInitializedAsync()
     {
+        songs = await Http.GetFromJsonAsync<List<Song>>("api/songs");
+
+        // Initialize the ratings dictionary for each song (if any ratings are already provided)
+        foreach (var song in songs)
+        {
+            if (!songRatings.ContainsKey(song.Id))
+            {
+                songRatings[song.Id] = 0; // Default to no rating (or you can set it to the existing average)
+            }
+        }
+    }
+
+    private async Task SubmitRating(Guid songId)
+    {
+        var rating = songRatings[songId];  
+
+        await Http.PostAsJsonAsync($"api/songs/{songId}/ratings", rating);
+
         songs = await Http.GetFromJsonAsync<List<Song>>("api/songs");
     }
 }
@@ -22,7 +41,17 @@
                 <div class="glass p-6 border border-gray-300 rounded-lg text-white transition-transform transform hover:scale-105 hover:shadow-xl cursor-pointer">
                     <h3 class="text-xl font-semibold mb-2">@song.Title</h3>
                     <p class="text-md">Artist: <span class="font-light">@song.Artist</span></p>
+                    <p class="text-md">Average Rating: <span class="font-light">@Math.Round(song.AverageRating, 1)</span></p>
 
+                    <!-- Rating input for this specific song -->
+                    <input id="ratingInput" 
+                           type="number" 
+                           min="1" 
+                           max="5" 
+                           style = "color:black"
+                           @bind="songRatings[song.Id]"/>
+
+                    <button @onclick="() => SubmitRating(song.Id)" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Submit</button>
                 </div>
             }
         }
@@ -41,8 +70,6 @@
         font-family: 'Rajdhani', sans-serif;
     }
 
- 
-
     .glass {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px); 
@@ -51,15 +78,24 @@
         overflow: hidden; 
     }
 
-        .glass:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            pointer-events: none; 
-        }
+    .glass:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        pointer-events: none; 
+    }
+
+    /* Style the Submit Button */
+    button {
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #4CAF50;
+    }
 </style>

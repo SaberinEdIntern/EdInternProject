@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+<ItemGroup>
+    <ProjectReference Include="..\music-manager-start.Data\music-manager-start.Data.csproj" />
+    </ItemGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
